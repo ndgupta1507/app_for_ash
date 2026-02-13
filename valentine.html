@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a0a1e">
+<title>For You, My Love</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Quicksand:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--pink:#ff6b8a;--deep-pink:#e84575;--red:#e63946;--gold:#f4a261;--purple:#b5479e;--bg:#1a0a1e;--glass:rgba(255,255,255,0.06)}
+html{scroll-behavior:smooth}
+body{font-family:'Quicksand',sans-serif;background:var(--bg);color:#fff;overflow-x:hidden;-webkit-tap-highlight-color:transparent;min-height:100vh;min-height:100dvh}
+
+/* ========= FLOATING HEARTS ========= */
+.hearts-bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.hearts-bg span{position:absolute;bottom:-50px;animation:floatH linear infinite;opacity:.25}
+@keyframes floatH{0%{transform:translateY(0) rotate(0) scale(1);opacity:.25}50%{opacity:.5}100%{transform:translateY(-110vh) rotate(360deg) scale(.4);opacity:0}}
+
+/* ========= SECTIONS ========= */
+.section{min-height:100vh;min-height:100dvh;display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;position:relative;z-index:1}
+.section.active{display:flex}
+
+/* ========= CONFETTI ========= */
+.confetti-box{position:fixed;inset:0;pointer-events:none;z-index:999;overflow:hidden}
+.confetti-box i{position:absolute;top:-12px;width:10px;height:10px;border-radius:2px;animation:confDrop linear forwards}
+@keyframes confDrop{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(105vh) rotate(720deg);opacity:0}}
+
+/* ========= SPARKLES ========= */
+.sparkle{position:fixed;pointer-events:none;z-index:1000;font-size:18px;animation:sparkAnim .7s ease forwards}
+@keyframes sparkAnim{0%{transform:scale(0) rotate(0);opacity:1}60%{transform:scale(1.3) rotate(180deg);opacity:1}100%{transform:scale(0) rotate(360deg);opacity:0}}
+
+/* ========= GLOBAL ANIMATIONS ========= */
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{0%{transform:scale(0)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+@keyframes shimmer{0%{background-position:0% center}100%{background-position:200% center}}
+@keyframes pulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}}
+@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(255,107,138,.3)}50%{box-shadow:0 0 40px rgba(255,107,138,.6)}}
+@keyframes heartBeat{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.25)}}
+
+/* ===================================================
+   SECTION 1 — INTRO / ENVELOPE
+   =================================================== */
+#intro{background:radial-gradient(ellipse at 50% 40%,#2d1338 0%,var(--bg) 70%)}
+.intro-photo{width:120px;height:120px;border-radius:50%;overflow:hidden;border:3px solid var(--pink);box-shadow:0 0 30px rgba(255,107,138,.35);margin-bottom:24px;animation:fadeUp .8s ease both,glow 3s ease-in-out infinite}
+.intro-photo img{width:100%;height:100%;object-fit:cover}
+.intro-title{font-family:'Dancing Script',cursive;font-size:clamp(32px,8vw,46px);text-align:center;margin-bottom:28px;background:linear-gradient(135deg,var(--pink),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:fadeUp .8s ease .2s both}
+
+/* ENVELOPE — the button itself */
+.envelope-btn{
+  display:flex;align-items:center;justify-content:center;
+  width:240px;height:160px;
+  background:linear-gradient(135deg,var(--pink),var(--deep-pink));
+  border:none;border-radius:10px;position:relative;
+  cursor:pointer;touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;-webkit-user-select:none;
+  box-shadow:0 16px 50px rgba(255,107,138,.35);
+  transition:transform .25s ease;
+  animation:fadeUp .8s ease .4s both,glow 3s ease-in-out infinite;
+  outline:none;
+}
+.envelope-btn:active{transform:scale(.94)!important}
+.envelope-btn:hover{transform:scale(1.04)}
+/* flap */
+.envelope-btn::before{
+  content:'';position:absolute;top:0;left:0;width:0;height:0;
+  border-left:120px solid transparent;border-right:120px solid transparent;
+  border-top:90px solid var(--deep-pink);filter:brightness(.82);
+  pointer-events:none;z-index:2;
+  transition:transform .6s ease;transform-origin:top center;
+}
+.envelope-btn.open::before{transform:rotateX(180deg);filter:brightness(1.15)}
+.envelope-btn .heart-icon{font-size:42px;pointer-events:none;z-index:1;animation:heartBeat 1.2s ease-in-out infinite}
+
+.tap-hint{margin-top:24px;font-size:15px;opacity:.55;letter-spacing:2px;animation:fadeUp 1s ease .8s both,pulse 2.5s ease infinite 1.5s}
+
+/* ===================================================
+   SECTION 2 — NEGOTIATOR CHAT
+   =================================================== */
+#question{background:radial-gradient(ellipse at 50% 30%,#2d1338,var(--bg) 70%);padding:20px 14px;justify-content:flex-start;padding-top:28px}
+.chat-phone{width:100%;max-width:400px;background:rgba(0,0,0,.35);border-radius:28px;border:1.5px solid rgba(255,255,255,.07);overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.55);animation:fadeUp .7s ease both;display:flex;flex-direction:column;max-height:88vh;max-height:88dvh}
+.chat-top{background:rgba(255,255,255,.04);padding:14px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0}
+.chat-pic{width:42px;height:42px;border-radius:50%;overflow:hidden;border:2px solid var(--pink);flex-shrink:0}
+.chat-pic img{width:100%;height:100%;object-fit:cover}
+.chat-who{font-weight:700;font-size:15px}
+.chat-online{font-size:11px;opacity:.45;margin-top:2px}
+.chat-msgs{flex:1;overflow-y:auto;padding:18px 14px;display:flex;flex-direction:column;gap:9px;scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
+.chat-msgs::-webkit-scrollbar{width:0}
+
+/* bubbles */
+.bub{max-width:82%;padding:11px 15px;border-radius:18px;font-size:14.5px;line-height:1.5;animation:popIn .35s cubic-bezier(.18,.89,.32,1.28) both;word-wrap:break-word}
+.bub.me{align-self:flex-end;background:linear-gradient(135deg,var(--pink),var(--deep-pink));border-bottom-right-radius:5px}
+.bub.them{align-self:flex-start;background:rgba(255,255,255,.09);border-bottom-left-radius:5px}
+.bub .offer-icon{font-size:30px;display:block;margin-bottom:5px}
+.bub .offer-t{font-weight:700;font-size:15px;margin-bottom:3px}
+.bub .offer-fp{font-size:11px;opacity:.55;font-style:italic;margin-top:5px}
+
+/* typing dots */
+.typing{align-self:flex-start;padding:12px 16px;border-radius:18px 18px 18px 5px;background:rgba(255,255,255,.09);display:flex;gap:5px;align-items:center}
+.typing b{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.45);animation:tDot 1.3s ease-in-out infinite}
+.typing b:nth-child(2){animation-delay:.18s}
+.typing b:nth-child(3){animation-delay:.36s}
+@keyframes tDot{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+
+/* action buttons */
+.chat-acts{padding:12px 14px;border-top:1px solid rgba(255,255,255,.05);display:flex;gap:9px;flex-shrink:0;justify-content:center;flex-wrap:wrap}
+.cbtn{flex:1;min-width:115px;padding:13px 14px;font-size:14.5px;font-family:'Quicksand',sans-serif;font-weight:700;border:none;border-radius:14px;cursor:pointer;touch-action:manipulation;transition:transform .2s,box-shadow .2s}
+.cbtn:active{transform:scale(.95)}
+.cbtn-y{background:linear-gradient(135deg,var(--pink),var(--red));color:#fff;box-shadow:0 6px 22px rgba(255,107,138,.4)}
+.cbtn-n{background:rgba(255,255,255,.07);color:#fff;border:1px solid rgba(255,255,255,.12)}
+
+/* ===================================================
+   SECTION 3 — CELEBRATION
+   =================================================== */
+#celebration{background:radial-gradient(ellipse at 50% 40%,#2d1338,var(--bg) 70%)}
+.celeb-photo{width:130px;height:130px;border-radius:50%;overflow:hidden;border:3px solid var(--gold);box-shadow:0 0 40px rgba(244,162,97,.3);animation:popIn .7s ease both}
+.celeb-photo img{width:100%;height:100%;object-fit:cover}
+.celeb-h{font-family:'Dancing Script',cursive;font-size:clamp(32px,8vw,44px);margin:18px 0 8px;background:linear-gradient(135deg,var(--pink),var(--gold),var(--pink));background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 3s linear infinite,fadeUp .7s ease .3s both;text-align:center}
+.celeb-sub{font-size:17px;opacity:.75;animation:fadeUp .7s ease .5s both;text-align:center;max-width:320px}
+.next-btn{margin-top:36px;padding:15px 38px;font-size:17px;font-family:'Quicksand',sans-serif;font-weight:600;border:2px solid var(--pink);border-radius:50px;background:transparent;color:var(--pink);cursor:pointer;touch-action:manipulation;transition:all .25s;animation:fadeUp .7s ease .8s both}
+.next-btn:active{transform:scale(.95);background:var(--pink);color:#fff}
+.next-btn:hover{background:var(--pink);color:#fff}
+
+/* ===================================================
+   SECTION 4 — REASONS CAROUSEL
+   =================================================== */
+#reasons{background:radial-gradient(ellipse at 50% 40%,#2d1338,var(--bg) 70%);padding:24px 16px}
+.reasons-h{font-family:'Dancing Script',cursive;font-size:clamp(28px,7vw,36px);margin-bottom:24px;text-align:center;animation:fadeUp .7s ease both}
+.card-stack{position:relative;width:min(300px,88vw);height:min(400px,60vh)}
+.rcard{position:absolute;inset:0;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;text-align:center;transition:all .5s cubic-bezier(.18,.89,.32,1.28);cursor:pointer;touch-action:manipulation;user-select:none;box-shadow:0 14px 38px rgba(0,0,0,.3)}
+.rcard .re{font-size:54px;margin-bottom:16px}
+.rcard .rt{font-size:19px;font-weight:700;line-height:1.45}
+.rcard .rs{font-size:13.5px;margin-top:10px;opacity:.7;font-style:italic;line-height:1.5}
+.card-ct{margin-top:18px;font-size:13px;opacity:.5;letter-spacing:2px}
+.swipe-h{margin-top:10px;font-size:12px;opacity:.4;animation:fadeUp 1s ease 1s both}
+
+/* ===================================================
+   SECTION 5 — LOVE METER
+   =================================================== */
+#lovemeter{background:radial-gradient(ellipse at 50% 40%,#2d1338,var(--bg) 70%)}
+.meter-h{font-family:'Dancing Script',cursive;font-size:clamp(28px,7vw,36px);margin-bottom:24px;text-align:center}
+.meter-ring{width:210px;height:210px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:conic-gradient(var(--pink) 0%,rgba(255,255,255,.08) 0%);box-shadow:0 0 36px rgba(255,107,138,.25);transition:background .08s;margin:16px 0}
+.meter-core{width:164px;height:164px;border-radius:50%;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.meter-v{font-size:46px;font-weight:700;color:var(--pink)}
+.meter-l{font-size:11px;opacity:.5;text-transform:uppercase;letter-spacing:2px}
+.meter-go{margin-top:26px;padding:15px 38px;font-size:17px;font-family:'Quicksand',sans-serif;font-weight:700;border:none;border-radius:50px;background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;cursor:pointer;touch-action:manipulation;box-shadow:0 8px 28px rgba(181,71,158,.4);transition:transform .2s}
+.meter-go:active{transform:scale(.95)}
+.meter-go:disabled{opacity:.45;cursor:not-allowed}
+.meter-msg{margin-top:18px;font-size:15px;min-height:55px;text-align:center;max-width:280px;line-height:1.5}
+
+/* ===================================================
+   SECTION 6 — GIFT BOX
+   =================================================== */
+#gift{background:radial-gradient(ellipse at 50% 40%,#2d1338,var(--bg) 70%)}
+.gift-h{font-family:'Dancing Script',cursive;font-size:clamp(28px,7vw,36px);margin-bottom:28px;text-align:center}
+.gbox-wrap{cursor:pointer;touch-action:manipulation}
+.gbox{width:150px;height:150px;background:linear-gradient(135deg,var(--red),var(--deep-pink));border-radius:12px;position:relative;box-shadow:0 18px 48px rgba(230,57,70,.3);display:flex;align-items:center;justify-content:center;transition:all .5s;animation:glow 3s ease-in-out infinite}
+.gbox::before{content:'';position:absolute;top:-14px;left:50%;transform:translateX(-50%);width:160px;height:28px;background:linear-gradient(135deg,var(--gold),#e09f3e);border-radius:7px 7px 0 0;pointer-events:none}
+.gbox::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:28px;height:100%;background:linear-gradient(135deg,var(--gold),#e09f3e);border-radius:3px;pointer-events:none}
+.gbox .rib{position:absolute;top:-38px;left:50%;transform:translateX(-50%);font-size:38px;pointer-events:none}
+.gbox.gone{transform:scale(0);opacity:0}
+.greveal{display:none;text-align:center;animation:fadeUp .7s ease both}
+.greveal.show{display:block}
+.greveal .ge{font-size:72px;animation:popIn .7s ease both}
+.greveal .gt{font-family:'Dancing Script',cursive;font-size:26px;margin-top:18px;line-height:1.5;color:var(--pink)}
+.greveal .gs{font-size:15px;margin-top:14px;opacity:.65;max-width:300px;line-height:1.6;display:inline-block}
+.gift-tap{margin-top:18px;font-size:13px;opacity:.45;animation:pulse 2.5s ease infinite}
+
+/* ===================================================
+   SECTION 7 — LOVE LETTER
+   =================================================== */
+#letter{background:radial-gradient(ellipse at 50% 30%,#2d1338,var(--bg) 70%);padding:36px 18px}
+.letter-photo{width:90px;height:90px;border-radius:50%;overflow:hidden;border:2px solid var(--gold);margin-bottom:20px;animation:fadeUp .7s ease both}
+.letter-photo img{width:100%;height:100%;object-fit:cover}
+.letter-box{max-width:400px;width:100%;background:var(--glass);border:1px solid rgba(255,255,255,.08);border-radius:22px;padding:36px 26px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);animation:fadeUp .8s ease .2s both}
+.letter-hd{font-family:'Dancing Script',cursive;font-size:30px;color:var(--pink);margin-bottom:22px}
+.letter-bd{font-size:15.5px;line-height:1.85;opacity:.88}
+.letter-bd p{margin-bottom:14px}
+.letter-sg{font-family:'Dancing Script',cursive;font-size:23px;color:var(--gold);margin-top:22px;text-align:right}
+.final-h{margin-top:28px;font-size:28px;text-align:center;animation:heartBeat 1.5s ease-in-out infinite}
+.again-btn{margin-top:28px;padding:11px 28px;font-size:13px;font-family:'Quicksand',sans-serif;font-weight:600;border:1px solid rgba(255,255,255,.18);border-radius:50px;background:transparent;color:rgba(255,255,255,.45);cursor:pointer;touch-action:manipulation;transition:all .25s}
+.again-btn:active,.again-btn:hover{border-color:var(--pink);color:var(--pink)}
+
+/* ========= HIDE ON INIT ========= */
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<!-- Background Hearts -->
+<div class="hearts-bg" id="hbg"></div>
+
+<!-- Confetti Layer -->
+<div class="confetti-box" id="confBox"></div>
+
+<!-- ==================== SECTION 1: INTRO ==================== -->
+<div class="section active" id="s-intro">
+  <div class="intro-photo"><img src="photo.jpg" alt="Us"></div>
+  <h1 class="intro-title">I Made Something<br>For You...</h1>
+  <button class="envelope-btn" id="envBtn" type="button" aria-label="Open envelope">
+    <span class="heart-icon">💌</span>
+  </button>
+  <p class="tap-hint">tap the envelope</p>
+</div>
+
+<!-- ==================== SECTION 2: CHAT ==================== -->
+<div class="section" id="s-chat">
+  <div class="chat-phone">
+    <div class="chat-top">
+      <div class="chat-pic"><img src="photo.jpg" alt=""></div>
+      <div>
+        <div class="chat-who">Your Valentine</div>
+        <div class="chat-online">online &mdash; desperately waiting</div>
+      </div>
+    </div>
+    <div class="chat-msgs" id="chatMsgs"></div>
+    <div class="chat-acts" id="chatActs"></div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 3: CELEBRATION ==================== -->
+<div class="section" id="s-celeb">
+  <div class="celeb-photo"><img src="photo.jpg" alt=""></div>
+  <h2 class="celeb-h">Best Deal Ever Made!</h2>
+  <p class="celeb-sub">I would have offered the whole universe, but you already are mine</p>
+  <button class="next-btn" id="goReasons" type="button">See Why I Love You &rarr;</button>
+</div>
+
+<!-- ==================== SECTION 4: REASONS ==================== -->
+<div class="section" id="s-reasons">
+  <h2 class="reasons-h">Reasons I Love You</h2>
+  <div class="card-stack" id="cardStack"></div>
+  <p class="card-ct" id="cardCt"></p>
+  <p class="swipe-h">&larr; swipe or tap to see next &rarr;</p>
+  <button class="next-btn hidden" id="goMeter" type="button">Next Surprise &rarr;</button>
+</div>
+
+<!-- ==================== SECTION 5: LOVE METER ==================== -->
+<div class="section" id="s-meter">
+  <h2 class="meter-h">Our Love-O-Meter</h2>
+  <div class="meter-ring" id="mRing">
+    <div class="meter-core">
+      <div class="meter-v" id="mVal">0%</div>
+      <div class="meter-l">compatibility</div>
+    </div>
+  </div>
+  <button class="meter-go" id="mBtn" type="button">Calculate Our Love</button>
+  <p class="meter-msg" id="mMsg"></p>
+  <button class="next-btn hidden" id="goGift" type="button">Open Your Gift &rarr;</button>
+</div>
+
+<!-- ==================== SECTION 6: GIFT ==================== -->
+<div class="section" id="s-gift">
+  <h2 class="gift-h">I Got You Something... 🎁</h2>
+  <div class="gbox-wrap" id="gWrap">
+    <div class="gbox" id="gBox"><span class="rib">🎀</span></div>
+  </div>
+  <p class="gift-tap" id="gTap">tap to open!</p>
+  <div class="greveal" id="gReveal">
+    <div class="ge">🧸💐</div>
+    <p class="gt">Unlimited Hugs &amp; Kisses<br>+ One Free "You're Right" Card</p>
+    <p class="gs">Redeemable anytime. No expiration. Side effects may include excessive smiling, random giggling, and heart palpitations.</p>
+    <button class="next-btn" style="margin-top:28px" id="goLetter" type="button">Read My Letter &rarr;</button>
+  </div>
+</div>
+
+<!-- ==================== SECTION 7: LOVE LETTER ==================== -->
+<div class="section" id="s-letter">
+  <div class="letter-photo"><img src="photo.jpg" alt=""></div>
+  <div class="letter-box">
+    <h2 class="letter-hd">My Dearest Love,</h2>
+    <div class="letter-bd">
+      <p>Your smile could light up the darkest room &mdash; and it lights up my life every single day. 🌸</p>
+      <p>You are beautiful, hot, sweet, caring, and so loving. You are the reason I check my phone with a stupid grin, the reason my heart does that weird flippy thing, and honestly, the reason I have not completely lost it yet. 😄</p>
+      <p>Thank you for being my favorite notification, my best adventure, and the only person I would share my fries with. You take care of me in the smallest and biggest ways, and I never stop feeling lucky. 🍟💕</p>
+      <p>Every day with you feels like a bonus level in the game of life &mdash; and I never want to stop playing. 🎮</p>
+      <p>Happy Valentine's Day, gorgeous. Here is to your smile, your heart, and a million more reasons to love you.</p>
+    </div>
+    <p class="letter-sg">Forever Yours ❤️</p>
+  </div>
+  <div class="final-h">💖✨💖✨💖</div>
+  <button class="again-btn" id="restart" type="button">Start Over 🔄</button>
+</div>
+
+<!-- ==================== JAVASCRIPT ==================== -->
+<script>
+(function(){
+  "use strict";
+
+  /* ---- Helpers ---- */
+  var $ = function(id){ return document.getElementById(id); };
+  var allSections = ["s-intro","s-chat","s-celeb","s-reasons","s-meter","s-gift","s-letter"];
+
+  function go(id){
+    allSections.forEach(function(s){
+      var el = $(s);
+      if(el){
+        el.classList.remove("active");
+        el.style.display = "none";
+      }
+    });
+    var target = $(id);
+    if(target){
+      target.classList.add("active");
+      target.style.display = "flex";
+      window.scrollTo(0,0);
+    }
+    if(id === "s-chat") startChat();
+  }
+
+  /* ---- Floating Hearts ---- */
+  (function(){
+    var bg = $("hbg");
+    var h = ["\u2764\uFE0F","\uD83D\uDC95","\uD83D\uDC96","\uD83D\uDC97","\uD83D\uDC93","\uD83D\uDC98","\uD83D\uDC9D","\uD83E\uDE77"];
+    for(var i=0;i<18;i++){
+      var s = document.createElement("span");
+      s.textContent = h[Math.floor(Math.random()*h.length)];
+      s.style.left = Math.random()*100+"%";
+      s.style.animationDuration = (9+Math.random()*12)+"s";
+      s.style.animationDelay = Math.random()*10+"s";
+      s.style.fontSize = (14+Math.random()*16)+"px";
+      bg.appendChild(s);
+    }
+  })();
+
+  /* ---- Sparkle on tap ---- */
+  document.addEventListener("click",function(e){
+    var icons = ["\u2728","\uD83D\uDC96","\u2B50","\uD83D\uDCAB","\uD83C\uDF1F"];
+    for(var i=0;i<3;i++){
+      var sp = document.createElement("span");
+      sp.className = "sparkle";
+      sp.textContent = icons[Math.floor(Math.random()*icons.length)];
+      sp.style.left = (e.clientX+(Math.random()-.5)*36)+"px";
+      sp.style.top  = (e.clientY+(Math.random()-.5)*36)+"px";
+      document.body.appendChild(sp);
+      (function(el){ setTimeout(function(){ el.remove(); },700); })(sp);
+    }
+  });
+
+  /* ---- Confetti ---- */
+  function confetti(){
+    var box = $("confBox");
+    var cols = ["#ff6b8a","#e84575","#f4a261","#b5479e","#fff","#ff9ecd","#ffd700"];
+    for(var i=0;i<90;i++){
+      var c = document.createElement("i");
+      c.style.left = Math.random()*100+"%";
+      c.style.background = cols[Math.floor(Math.random()*cols.length)];
+      c.style.width = (6+Math.random()*7)+"px";
+      c.style.height = (6+Math.random()*7)+"px";
+      c.style.animationDuration = (2+Math.random()*3)+"s";
+      c.style.animationDelay = Math.random()+"s";
+      box.appendChild(c);
+    }
+    setTimeout(function(){ box.innerHTML=""; },5500);
+  }
+
+  /* ==========================================================
+     SECTION 1 — ENVELOPE
+     ========================================================== */
+  var envOpened = false;
+
+  function openEnvelope(){
+    if(envOpened) return;
+    envOpened = true;
+    var btn = $("envBtn");
+    btn.classList.add("open");
+    setTimeout(function(){ go("s-chat"); }, 750);
+  }
+
+  // Attach with addEventListener — bulletproof
+  var envBtn = $("envBtn");
+  envBtn.addEventListener("click", openEnvelope);
+  envBtn.addEventListener("touchend", function(e){
+    e.preventDefault();
+    openEnvelope();
+  }, {passive:false});
+
+  /* ==========================================================
+     SECTION 2 — NEGOTIATOR CHAT
+     ========================================================== */
+  var chatStep = 0;
+  var chatLock = false;
+
+  var offers = [
+    {
+      sent: null,
+      reply: "Hey... I have a very important question for you \uD83E\uDD7A",
+      followUp: "Will you be my Valentine? \uD83D\uDC98",
+      yes: "Yes!! \uD83D\uDC96",
+      no:  "Hmm convince me \uD83E\uDD14"
+    },
+    {
+      sent: "Hmm convince me \uD83E\uDD14",
+      reply: null,
+      offer: {
+        icon: "\uD83E\uDD5E\u2615",
+        title: "Breakfast in bed \u2014 every weekend",
+        text: "Fluffy vegan pancakes, fresh fruit, parathas, chai \u2014 the full veg spread, no eggs. I will even do that fancy latte art thing. (It will look like a blob but it is made with love.)",
+        fine: "100% vegetarian. Offer valid while supplies of motivation last"
+      },
+      yes: "Okay DEAL \uD83D\uDC95",
+      no:  "Not enough... \uD83D\uDE0F"
+    },
+    {
+      sent: "Not enough... \uD83D\uDE0F",
+      reply: "Oh you are a tough negotiator...",
+      offer: {
+        icon: "\uD83D\uDCFA\uD83D\uDECB\uFE0F",
+        title: "Full Netflix remote control",
+        text: "You pick EVERYTHING we watch. No complaints. No \"can we watch something else\". Just me, smiling, watching whatever you want.",
+        fine: "Yes, even that show I pretend to hate"
+      },
+      yes: "Tempting... YES! \uD83D\uDC97",
+      no:  "Keep going... \uD83D\uDC85"
+    },
+    {
+      sent: "Keep going... \uD83D\uDC85",
+      reply: "You drive a hard bargain. Fine...",
+      offer: {
+        icon: "\uD83D\uDC86\u200D\u2640\uFE0F\uD83D\uDC51",
+        title: "Royal spa treatment at home",
+        text: "Foot massages on demand. Face masks together (yes I will wear one too). Candles, music, the whole vibe. I will even paint your nails.",
+        fine: "Results may vary. Emotional damage from seeing my nail art skills not covered."
+      },
+      yes: "OMG okay yes!! \uD83E\uDD70",
+      no:  "I need MORE \uD83D\uDC40"
+    },
+    {
+      sent: "I need MORE \uD83D\uDC40",
+      reply: "Are you kidding me \uD83D\uDE29 Okay okay...",
+      offer: {
+        icon: "\u2B50\uD83C\uDF19",
+        title: "I will name a star after you",
+        text: "Actually no, I will name the WHOLE constellation after you. The astronomers will be confused but they will understand when they see how beautiful you are.",
+        fine: "NASA has not approved this. Yet."
+      },
+      yes: "That is so sweet, YES \uD83D\uDC98",
+      no:  "Stars are not enough \uD83C\uDF0C"
+    },
+    {
+      sent: "Stars are not enough \uD83C\uDF0C",
+      reply: "STARS are not enough?! \uD83D\uDE2D Okay, going nuclear...",
+      offer: {
+        icon: "\u23F0\uD83E\uDD95",
+        title: "I will build a time machine",
+        text: "So I can go back and find you sooner. Every moment before I met you? Wasted. I want a refund on all those years.",
+        fine: "Time machine ETA: undefined. Love ETA: already here."
+      },
+      yes: "FINE YES I AM YOURS \uD83D\uDE2D\uD83D\uDC95",
+      no:  "One more... \uD83E\uDD2D"
+    },
+    {
+      sent: "One more... \uD83E\uDD2D",
+      reply: "Okay... you win. This is my final offer. Everything I have.",
+      offer: {
+        icon: "\uD83D\uDC9D",
+        title: "My whole heart. That is it.",
+        text: "No tricks, no gimmicks. Just me \u2014 messy, imperfect, but completely in love with you. You are beautiful, hot, sweet, caring, and so loving. I do not have stars or time machines. But I have a heart that beats your name.",
+        fine: ""
+      },
+      yes: "Yes. A million times yes. \uD83D\uDC96",
+      no: null
+    }
+  ];
+
+  var yesReactions = [
+    "YESSS!! \uD83C\uDF89\uD83C\uDF89\uD83C\uDF89 I am the happiest person alive right now!!",
+    "I KNEW it would work! \uD83D\uDE0F\uD83D\uDC95 You had me at breakfast in bed!",
+    "The remote is YOURS forever! \uD83C\uDFAC\uD83D\uDC96 Best deal I ever made!",
+    "You deserve the royal treatment every day! \uD83D\uDC51\uD83D\uDC95",
+    "I will get started on that constellation paperwork! \u2B50\uD83D\uDC95",
+    "Time machine is already set to destination: YOU! \uD83D\uDE80\uD83D\uDC95",
+    "You have my heart. You always did. \uD83D\uDC96 Now it is just official."
+  ];
+
+  function startChat(){
+    chatStep = 0;
+    chatLock = false;
+    $("chatMsgs").innerHTML = "";
+    $("chatActs").innerHTML = "";
+    setTimeout(advChat, 400);
+  }
+
+  function scrollMsgs(){
+    var m = $("chatMsgs");
+    m.scrollTop = m.scrollHeight;
+  }
+
+  function addBub(html, cls, cb){
+    var d = document.createElement("div");
+    d.className = "bub " + cls;
+    d.innerHTML = html;
+    $("chatMsgs").appendChild(d);
+    scrollMsgs();
+    if(cb) setTimeout(cb, 80);
+  }
+
+  function addOffer(o, cb){
+    var html = "<span class='offer-icon'>" + o.icon + "</span>" +
+               "<div class='offer-t'>" + o.title + "</div>" +
+               "<div>" + o.text + "</div>" +
+               (o.fine ? "<div class='offer-fp'>" + o.fine + "</div>" : "");
+    addBub(html, "them", cb);
+  }
+
+  function showDots(ms, cb){
+    var d = document.createElement("div");
+    d.className = "typing";
+    d.innerHTML = "<b></b><b></b><b></b>";
+    $("chatMsgs").appendChild(d);
+    scrollMsgs();
+    setTimeout(function(){ d.remove(); if(cb) cb(); }, ms);
+  }
+
+  function showBtns(yTxt, nTxt){
+    var box = $("chatActs");
+    box.innerHTML = "";
+    if(yTxt){
+      var y = document.createElement("button");
+      y.className = "cbtn cbtn-y";
+      y.textContent = yTxt;
+      y.type = "button";
+      y.addEventListener("click", function(){ onYes(yTxt); });
+      box.appendChild(y);
+    }
+    if(nTxt){
+      var n = document.createElement("button");
+      n.className = "cbtn cbtn-n";
+      n.textContent = nTxt;
+      n.type = "button";
+      n.addEventListener("click", function(){ onConvince(); });
+      box.appendChild(n);
+    }
+  }
+
+  function advChat(){
+    if(chatLock) return;
+    chatLock = true;
+    var s = offers[chatStep];
+    $("chatActs").innerHTML = "";
+
+    if(s.sent) addBub(s.sent, "me");
+
+    var after = function(){
+      if(s.reply){
+        showDots(1100, function(){
+          addBub(s.reply, "them", function(){
+            if(s.followUp){
+              showDots(750, function(){
+                addBub(s.followUp, "them", function(){
+                  showBtns(s.yes, s.no);
+                  chatLock = false;
+                });
+              });
+            } else if(s.offer){
+              showDots(900, function(){
+                addOffer(s.offer, function(){
+                  showBtns(s.yes, s.no);
+                  chatLock = false;
+                });
+              });
+            } else {
+              showBtns(s.yes, s.no);
+              chatLock = false;
+            }
+          });
+        });
+      } else if(s.offer){
+        showDots(1300, function(){
+          addOffer(s.offer, function(){
+            showBtns(s.yes, s.no);
+            chatLock = false;
+          });
+        });
+      } else {
+        showBtns(s.yes, s.no);
+        chatLock = false;
+      }
+    };
+
+    setTimeout(after, s.sent ? 450 : 80);
+  }
+
+  function onYes(txt){
+    if(chatLock) return;
+    chatLock = true;
+    $("chatActs").innerHTML = "";
+    addBub(txt, "me");
+    showDots(900, function(){
+      addBub(yesReactions[Math.min(chatStep, yesReactions.length-1)], "them", function(){
+        chatLock = false;
+        confetti();
+        setTimeout(function(){ go("s-celeb"); }, 1400);
+      });
+    });
+  }
+
+  function onConvince(){
+    if(chatLock) return;
+    chatStep++;
+    if(chatStep < offers.length) advChat();
+  }
+
+  /* ==========================================================
+     SECTION 3 — CELEBRATION → REASONS
+     ========================================================== */
+  $("goReasons").addEventListener("click", function(){
+    go("s-reasons");
+    buildCards();
+  });
+
+  /* ==========================================================
+     SECTION 4 — REASONS CARDS
+     ========================================================== */
+  var reasons = [
+    {e:"\uD83D\uDE0A",t:"Your smile lights up my whole world",s:"Seriously. One smile from you and I forget everything else. It is the most beautiful thing I have ever seen."},
+    {e:"\uD83D\uDC95",t:"You are beautiful inside and out",s:"And yeah, you are also really hot. Like, really hot. I had to say it."},
+    {e:"\uD83C\uDF6C",t:"You are the sweetest person I know",s:"The way you care about little things \u2014 and big things \u2014 makes me fall for you more every day."},
+    {e:"\uD83E\uDD17",t:"You are so caring and loving",s:"Your hugs fix everything. Bad day? Hug. Tired? Hug. Stubbed my toe? HUGE hug."},
+    {e:"\uD83D\uDECB\uFE0F",t:"Netflix and Chill actually means Netflix and Chill with you",s:"And I love that you steal the blanket every time. Still worth it."},
+    {e:"\uD83D\uDE02",t:"Your laugh is my favorite sound",s:"Even when you snort. Especially when you snort. That smile + that laugh = game over for me."},
+    {e:"\uD83C\uDF05",t:"Waking up next to you is better than any alarm",s:"Mostly because you ARE my alarm... \"wake uppp!\" \u2014 and I would not have it any other way."},
+    {e:"\uD83C\uDFAD",t:"Your dramatic reactions to everything",s:"You could win an Oscar. And you still look beautiful doing it."},
+    {e:"\uD83D\uDC51",t:"You are my queen \u2014 beautiful, hot, sweet, caring, loving",s:"I am your... well, whatever you need. Snack-fetcher? Heater? Forever fan? All of the above."},
+    {e:"\u267E\uFE0F",t:"I could list a million more reasons",s:"Your smile alone could fill a book. Happy Valentine's Day, my love. \uD83D\uDC98"}
+  ];
+
+  var curCard = 0, swX = 0;
+  var gradients = [
+    "linear-gradient(135deg,#ff6b8a,#e84575)",
+    "linear-gradient(135deg,#b5479e,#8b2fc9)",
+    "linear-gradient(135deg,#f4a261,#e76f51)",
+    "linear-gradient(135deg,#e63946,#c1121f)",
+    "linear-gradient(135deg,#ff6b8a,#b5479e)",
+    "linear-gradient(135deg,#8b2fc9,#6a0572)",
+    "linear-gradient(135deg,#e76f51,#e63946)",
+    "linear-gradient(135deg,#f4a261,#ff6b8a)",
+    "linear-gradient(135deg,#c1121f,#b5479e)",
+    "linear-gradient(135deg,#6a0572,#e84575)"
+  ];
+
+  function buildCards(){
+    curCard = 0;
+    var st = $("cardStack");
+    st.innerHTML = "";
+    reasons.forEach(function(r,i){
+      var c = document.createElement("div");
+      c.className = "rcard";
+      c.style.background = gradients[i % gradients.length];
+      c.style.zIndex = reasons.length - i;
+      c.style.transform = "scale("+(1-i*.03)+") translateY("+(i*8)+"px)";
+      c.style.opacity = i < 3 ? 1 : 0;
+      c.innerHTML = "<span class='re'>"+r.e+"</span><p class='rt'>"+r.t+"</p><p class='rs'>"+r.s+"</p>";
+      st.appendChild(c);
+    });
+    updCt();
+
+    // touch + click
+    st.addEventListener("touchstart", function(e){ swX = e.touches[0].clientX; }, {passive:true});
+    st.addEventListener("touchend", function(e){
+      var diff = e.changedTouches[0].clientX - swX;
+      if(Math.abs(diff) > 45) flipCard(diff > 0 ? 1 : -1);
+    });
+    st.addEventListener("click", function(){ flipCard(1); });
+  }
+
+  function flipCard(dir){
+    var cards = document.querySelectorAll(".rcard");
+    if(curCard >= reasons.length - 1) return;
+    cards[curCard].style.transform = "translateX("+(dir*400)+"px) rotate("+(dir*20)+"deg)";
+    cards[curCard].style.opacity = 0;
+    curCard++;
+    cards.forEach(function(c,i){
+      if(i >= curCard){
+        var off = i - curCard;
+        c.style.transform = "scale("+(1-off*.03)+") translateY("+(off*8)+"px)";
+        c.style.opacity = off < 3 ? 1 : 0;
+        c.style.zIndex = reasons.length - off;
+      }
+    });
+    updCt();
+    if(curCard >= reasons.length - 1){
+      setTimeout(function(){ $("goMeter").classList.remove("hidden"); }, 450);
+    }
+  }
+
+  function updCt(){
+    $("cardCt").textContent = (curCard+1) + " / " + reasons.length;
+  }
+
+  $("goMeter").addEventListener("click", function(){ go("s-meter"); });
+
+  /* ==========================================================
+     SECTION 5 — LOVE METER
+     ========================================================== */
+  var meterBusy = false;
+
+  function calcLove(){
+    if(meterBusy) return;
+    meterBusy = true;
+    var btn = $("mBtn");
+    var val = $("mVal");
+    var msg = $("mMsg");
+    var ring = $("mRing");
+    btn.disabled = true;
+
+    var phases = [
+      {to:15, txt:"Hmm, calculating... \uD83E\uDD14"},
+      {to:33, txt:"Scanning your cuteness levels... \uD83D\uDCE1"},
+      {to:52, txt:"Cross-referencing heart data... \uD83D\uDC93"},
+      {to:71, txt:"Results are looking SPICY... \uD83C\uDF36\uFE0F"},
+      {to:88, txt:"Almost there... love overload! \u26A1"},
+      {to:100, txt:""}
+    ];
+
+    var cur = 0, phase = 0;
+    var iv = setInterval(function(){
+      if(phase < phases.length){
+        if(cur < phases[phase].to){
+          cur++;
+          val.textContent = cur + "%";
+          ring.style.background = "conic-gradient(var(--pink) "+cur+"%, var(--deep-pink) "+cur+"%, rgba(255,255,255,.08) "+cur+"%)";
+        } else {
+          msg.textContent = phases[phase].txt;
+          phase++;
+        }
+      } else {
+        clearInterval(iv);
+        var ex = 100;
+        var iv2 = setInterval(function(){
+          ex += 3;
+          val.textContent = ex + "%";
+          if(ex >= 143){
+            clearInterval(iv2);
+            val.textContent = "\u221E%";
+            msg.innerHTML = "ERROR: Love too powerful to measure! \uD83D\uDCA5<br><small>System overloaded. Sending extra kisses...</small>";
+            confetti();
+            meterBusy = false;
+            setTimeout(function(){ $("goGift").classList.remove("hidden"); }, 900);
+          }
+        }, 50);
+      }
+    }, 28);
+  }
+
+  $("mBtn").addEventListener("click", calcLove);
+  $("goGift").addEventListener("click", function(){ go("s-gift"); });
+
+  /* ==========================================================
+     SECTION 6 — GIFT BOX
+     ========================================================== */
+  var giftDone = false;
+
+  function openGift(){
+    if(giftDone) return;
+    giftDone = true;
+    $("gTap").style.display = "none";
+    $("gBox").classList.add("gone");
+    setTimeout(function(){
+      $("gWrap").style.display = "none";
+      $("gReveal").classList.add("show");
+      confetti();
+    }, 500);
+  }
+
+  $("gWrap").addEventListener("click", openGift);
+  $("gWrap").addEventListener("touchend", function(e){ e.preventDefault(); openGift(); }, {passive:false});
+
+  $("goLetter").addEventListener("click", function(){
+    go("s-letter");
+    confetti();
+  });
+
+  /* ==========================================================
+     SECTION 7 — RESTART
+     ========================================================== */
+  $("restart").addEventListener("click", function(){
+    envOpened = false;
+    chatStep = 0;
+    chatLock = false;
+    giftDone = false;
+    meterBusy = false;
+    curCard = 0;
+    $("envBtn").classList.remove("open");
+    $("chatMsgs").innerHTML = "";
+    $("chatActs").innerHTML = "";
+    $("gBox").classList.remove("gone");
+    $("gWrap").style.display = "";
+    $("gReveal").classList.remove("show");
+    $("gTap").style.display = "";
+    $("mBtn").disabled = false;
+    $("mVal").textContent = "0%";
+    $("mMsg").textContent = "";
+    $("mRing").style.background = "";
+    $("goGift").classList.add("hidden");
+    $("goMeter").classList.add("hidden");
+    go("s-intro");
+  });
+
+  /* ---- INIT ---- */
+  go("s-intro");
+
+})();
+</script>
+</body>
+</html>
